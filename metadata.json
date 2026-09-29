@@ -1,0 +1,6 @@
+{
+  "name": "Erotic Character Architect",
+  "description": "Step-by-step psychological & erotic character profile builder for literature and role-play with mood boards and relationship maps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
