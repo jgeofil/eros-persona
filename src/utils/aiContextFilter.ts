@@ -152,8 +152,12 @@ export function filterCharacterForStep(
     if (character.primaryBlueprint) clean.primaryBlueprint = character.primaryBlueprint;
     if (character.sesExcitationScore) clean.sesExcitationScore = character.sesExcitationScore;
     if (character.sisInhibitionScore) clean.sisInhibitionScore = character.sisInhibitionScore;
-    if (character.excitationTriggers?.length) clean.excitationTriggers = character.excitationTriggers;
-    if (character.inhibitionBrakes?.length) clean.inhibitionBrakes = character.inhibitionBrakes;
+    if (character.excitationTriggers?.length && targetFieldName !== 'excitationTrigger' && targetFieldName !== 'excitationTriggers') {
+      clean.excitationTriggers = character.excitationTriggers;
+    }
+    if (character.inhibitionBrakes?.length && targetFieldName !== 'inhibitionBrake' && targetFieldName !== 'inhibitionBrakes') {
+      clean.inhibitionBrakes = character.inhibitionBrakes;
+    }
 
     if (character.sexualProximityPattern?.trim() && targetFieldName !== 'sexualProximityPattern') {
       clean.sexualProximityPattern = character.sexualProximityPattern.trim();
@@ -213,10 +217,10 @@ export function filterCharacterForStep(
     if (character.defendedModeDescription?.trim() && targetFieldName !== 'defendedModeDescription') {
       clean.defendedModeDescription = character.defendedModeDescription.trim();
     }
-    if (character.highYieldContradictions && character.highYieldContradictions.length > 0) {
+    if (character.highYieldContradictions && character.highYieldContradictions.length > 0 && targetFieldName !== 'contradiction' && targetFieldName !== 'highYieldContradictions') {
       clean.highYieldContradictions = character.highYieldContradictions;
     }
-    if (character.oscillationTriggers && character.oscillationTriggers.length > 0) {
+    if (character.oscillationTriggers && character.oscillationTriggers.length > 0 && targetFieldName !== 'oscillationTriggerIf' && targetFieldName !== 'oscillationSwitchThen' && targetFieldName !== 'oscillationTriggers') {
       clean.oscillationTriggers = character.oscillationTriggers;
     }
     if (character.layer5Rules) {
@@ -230,7 +234,7 @@ export function filterCharacterForStep(
       if (character.layer5Rules.verbalLimits?.trim() && targetFieldName !== 'verbalLimits') {
         rules.verbalLimits = character.layer5Rules.verbalLimits.trim();
       }
-      if (character.layer5Rules.nonNegotiableRules?.length) {
+      if (character.layer5Rules.nonNegotiableRules?.length && targetFieldName !== 'nonNegotiableRule') {
         rules.nonNegotiableRules = character.layer5Rules.nonNegotiableRules;
       }
       if (Object.keys(rules).length > 0) clean.layer5Rules = rules;
@@ -238,7 +242,7 @@ export function filterCharacterForStep(
   }
 
   // Step 6: Backstory Chapters
-  if (targetStep >= 6 && character.backstoryChapters && character.backstoryChapters.length > 0) {
+  if (targetStep >= 6 && !targetFieldName?.startsWith('backstory') && character.backstoryChapters && character.backstoryChapters.length > 0) {
     clean.backstoryChapters = character.backstoryChapters.map((ch) => ({
       title: ch.title,
       period: ch.period,
@@ -248,7 +252,7 @@ export function filterCharacterForStep(
   }
 
   // Step 7: Moodboard
-  if (targetStep >= 7 && character.moodboard && character.moodboard.length > 0) {
+  if (targetStep >= 7 && !targetFieldName?.startsWith('moodboard') && character.moodboard && character.moodboard.length > 0) {
     clean.moodboard = character.moodboard.map((m) => ({
       type: m.type,
       label: m.label,
@@ -257,7 +261,7 @@ export function filterCharacterForStep(
   }
 
   // Step 8: Relationships
-  if (targetStep >= 8 && character.relationships && character.relationships.length > 0) {
+  if (targetStep >= 8 && !targetFieldName?.startsWith('relationship') && character.relationships && character.relationships.length > 0) {
     clean.relationships = character.relationships.map((r) => ({
       targetName: r.targetName,
       targetRole: r.targetRole,

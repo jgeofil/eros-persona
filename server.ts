@@ -151,30 +151,34 @@ function cleanCharacterSummary(character: any, targetStep: number, targetFieldNa
     if (isNonEmpty(character.defendedModeDescription) && targetFieldName !== 'defendedModeDescription') {
       clean.defendedModeDescription = character.defendedModeDescription.trim();
     }
-    if (character.highYieldContradictions?.length) clean.highYieldContradictions = character.highYieldContradictions;
-    if (character.oscillationTriggers?.length) clean.oscillationTriggers = character.oscillationTriggers;
+    if (character.highYieldContradictions?.length && targetFieldName !== 'contradiction' && targetFieldName !== 'highYieldContradictions') {
+      clean.highYieldContradictions = character.highYieldContradictions;
+    }
+    if (character.oscillationTriggers?.length && targetFieldName !== 'oscillationTriggerIf' && targetFieldName !== 'oscillationSwitchThen' && targetFieldName !== 'oscillationTriggers') {
+      clean.oscillationTriggers = character.oscillationTriggers;
+    }
     if (character.layer5Rules) {
       const rules: Record<string, any> = {};
       if (character.layer5Rules.postSexBehavior?.trim() && targetFieldName !== 'postSexBehavior') rules.postSexBehavior = character.layer5Rules.postSexBehavior.trim();
       if (character.layer5Rules.exitStrategies?.trim() && targetFieldName !== 'exitStrategies') rules.exitStrategies = character.layer5Rules.exitStrategies.trim();
       if (character.layer5Rules.verbalLimits?.trim() && targetFieldName !== 'verbalLimits') rules.verbalLimits = character.layer5Rules.verbalLimits.trim();
-      if (character.layer5Rules.nonNegotiableRules?.length) rules.nonNegotiableRules = character.layer5Rules.nonNegotiableRules;
+      if (character.layer5Rules.nonNegotiableRules?.length && targetFieldName !== 'nonNegotiableRule') rules.nonNegotiableRules = character.layer5Rules.nonNegotiableRules;
       if (Object.keys(rules).length > 0) clean.layer5Rules = rules;
     }
   }
 
   // Step 6
-  if (targetStep >= 6 && character.backstoryChapters?.length) {
+  if (targetStep >= 6 && !targetFieldName?.startsWith('backstory') && character.backstoryChapters?.length) {
     clean.backstoryChapters = character.backstoryChapters;
   }
 
   // Step 7
-  if (targetStep >= 7 && character.moodboard?.length) {
+  if (targetStep >= 7 && !targetFieldName?.startsWith('moodboard') && character.moodboard?.length) {
     clean.moodboard = character.moodboard;
   }
 
   // Step 8
-  if (targetStep >= 8 && character.relationships?.length) {
+  if (targetStep >= 8 && !targetFieldName?.startsWith('relationship') && character.relationships?.length) {
     clean.relationships = character.relationships;
   }
 
@@ -196,9 +200,9 @@ app.post("/api/gemini/assist", async (req, res) => {
       });
     }
 
-    const { task, character, prompt, fieldName, fieldLabel, currentValue, context, step } = req.body;
+    const { task, character, prompt, fieldName, fieldLabel, context, step } = req.body;
 
-    const charName = (character?.name && character.name !== 'New Character' && character.name.trim() !== '') ? character.name : 'the character';
+    const charName = (character?.name && character.name !== 'New Character' && character.name.trim() !== '' && fieldName !== 'name') ? character.name : 'the character';
     const charGender = (character?.gender && character.gender !== 'Unspecified' && character.gender.trim() !== '') ? character.gender : 'Unspecified';
     const charPronouns = (character?.pronouns && character.pronouns.trim() !== '') ? character.pronouns : 'they/them';
 
@@ -377,14 +381,12 @@ Character context: ${JSON.stringify(cleanCharacterSummary(character, 7), null, 2
 Target Character Context (established in preceding steps only):
 ${contextText}
 ${context ? `Field context/category: ${context}\n` : ""}
-${currentValue ? `Current draft text in this field: "${currentValue}"\n` : "This field is currently empty.\n"}
 ${prompt ? `Specific direction: ${prompt}\n` : ""}
 
 Task:
 Propose a single, compelling, psychologically vivid, uninhibited suggestion specifically for this field: "${targetLabel}".
 - Base your proposal STRICTLY on the established character context provided above.
 - Do NOT assume or hallucinate attributes, settings, or tropes from unreached tabs or unmentioned steps.
-- If the field already contains draft text, provide an elevated, refined variation or creative alternative.
 
 CRITICAL VOCABULARY AND THEMATIC RULES:
 - Absolutely NEVER use the words "architect", "architecture", or "architectural".

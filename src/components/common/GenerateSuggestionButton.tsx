@@ -46,7 +46,6 @@ export const GenerateSuggestionButton: React.FC<GenerateSuggestionButtonProps> =
         fieldName,
         fieldLabel,
         step: targetStep,
-        currentValue: currentValue !== undefined ? String(currentValue) : '',
         character: filteredCharacter,
         context,
         prompt,
