@@ -7,6 +7,79 @@
     <meta name="description" content="Step-by-step psychological & erotic character profile builder for literature and role-play with mood boards and relationship maps." />
     <meta property="og:title" content="Erotic Character Architect" />
     <meta property="og:description" content="Step-by-step psychological & erotic character profile builder for literature and role-play with mood boards and relationship maps." />
+    <script>
+      (function() {
+        // AI Studio iframe environment disables HMR WebSockets.
+        // Provide mock transport for Vite HMR to prevent failed WebSocket connection errors.
+        if (typeof window !== 'undefined') {
+          class ViteMockWebSocket extends EventTarget {
+            static CONNECTING = 0;
+            static OPEN = 1;
+            static CLOSING = 2;
+            static CLOSED = 3;
+            CONNECTING = 0;
+            OPEN = 1;
+            CLOSING = 2;
+            CLOSED = 3;
+            readyState = 0;
+            url = '';
+            protocol = '';
+            binaryType = 'blob';
+            bufferedAmount = 0;
+            extensions = '';
+            constructor(url, protocols) {
+              super();
+              this.url = String(url || '');
+              this.protocol = Array.isArray(protocols) ? protocols[0] : (protocols || '');
+              setTimeout(() => {
+                this.readyState = 1;
+                this.dispatchEvent(new Event('open'));
+              }, 10);
+            }
+            send() {}
+            close() {
+              this.readyState = 3;
+              this.dispatchEvent(new Event('close'));
+            }
+          }
+
+          const NativeWebSocket = window.WebSocket;
+          if (NativeWebSocket) {
+            window.WebSocket = function(url, protocols) {
+              const isVite =
+                (typeof protocols === 'string' && protocols.includes('vite')) ||
+                (Array.isArray(protocols) && protocols.some(function(p) { return typeof p === 'string' && p.includes('vite'); })) ||
+                (typeof url === 'string' && (url.includes('vite-hmr') || url.includes('token=')));
+              if (isVite) {
+                return new ViteMockWebSocket(url, protocols);
+              }
+              return new NativeWebSocket(url, protocols);
+            };
+            Object.assign(window.WebSocket, NativeWebSocket);
+            window.WebSocket.prototype = NativeWebSocket.prototype;
+          }
+
+          // Also catch and suppress any residual Vite client error events
+          window.addEventListener('error', function(event) {
+            const msg = String(event?.message || event?.error?.message || '');
+            const file = String(event?.filename || event?.error?.stack || '');
+            if (msg.includes('WebSocket') || file.includes('@vite/client') || msg.includes('createWebSocketModuleRunnerTransport')) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              return true;
+            }
+          }, true);
+
+          window.addEventListener('unhandledrejection', function(event) {
+            const reason = String(event?.reason?.message || event?.reason?.stack || event?.reason || '');
+            if (reason.includes('WebSocket') || reason.includes('@vite/client') || reason.includes('createWebSocketModuleRunnerTransport')) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          }, true);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

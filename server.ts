@@ -5,6 +5,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
+process.env.DISABLE_HMR = "true";
 
 const app = express();
 const PORT = 3000;
@@ -560,7 +561,10 @@ function getSmartFallback(task?: string, fieldName?: string, character?: any): s
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);
